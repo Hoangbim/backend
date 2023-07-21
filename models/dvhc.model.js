@@ -6,11 +6,12 @@ export const hoang = "hoang";
 // const hagiangPath = path.join(process.cwd(), "data", "hagiang.json");
 
 // const hagiangList = JSON.parse(fs.readFileSync(hagiangPath, "utf-8")).hagiang;
-const distPath = path.join(process.cwd(), "data", "caobangList.json");
+const distPath = path.join(process.cwd(), "data", "listDistName.json");
 
-const caobangList = JSON.parse(fs.readFileSync(distPath, "utf-8")).caobang;
+const districtList = JSON.parse(fs.readFileSync(distPath, "utf-8"));
 
-console.log(caobangList);
+console.log(districtList);
+
 const fetchAndWriteFile = async (dist) => {
   const coordinatesList = { district: "", coordinates: [] };
   const splitName = dist.split(" ");
@@ -18,17 +19,16 @@ const fetchAndWriteFile = async (dist) => {
   if (splitName.length === 3) {
     try {
       coordinatesList.district = dist;
-      console.log("current district ", dist, "before fetch");
       const res = await fetch(
         `https://nominatim.openstreetmap.org/search.php?q=${splitName[0]}+${splitName[1]}+${splitName[2]}&polygon_geojson=1&format=json`
       );
-      console.log("current district ", dist, "after fetch");
+      console.log("current district ", dist);
       if (res) {
         const data = await res.json();
         if (data[0].geojson) {
           coordinatesList.coordinates.push(data[0]?.geojson?.coordinates);
           fs.appendFileSync(
-            path.join(process.cwd(), "data", "caobangCoor.json"),
+            path.join(process.cwd(), "data", "baccanPhuthoCoor.json"),
             JSON.stringify(coordinatesList),
             (err) => {
               if (err) {
@@ -70,11 +70,19 @@ const fetchAndWriteFile = async (dist) => {
   }
 };
 
-async function fetchAndWriteAll(distList) {
+async function fetchAndWriteAll(distList, prov) {
   for (const dist of distList) {
     await fetchAndWriteFile(dist);
   }
-  console.log("Hoàn thành!");
+  console.log("Hoàn thành tinh ", prov);
 }
 
-fetchAndWriteAll(caobangList);
+async function fetchListProvine(list) {
+  for (const prov in list) {
+    await fetchAndWriteAll(list[prov], prov);
+  }
+  console.log("xong");
+}
+
+// fetchAndWriteAll(caobangList);
+fetchListProvine(districtList);
