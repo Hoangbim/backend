@@ -6,7 +6,7 @@ import {
   getTrendingMovies,
 } from "../controller/admin.controller.js";
 import { searchMovies } from "../controller/search.controller.js";
-import { hoang } from "../models/dvhc.model.js";
+import { hoang } from "../models/remapCoorData.js";
 
 const adminRouter = express.Router();
 
